@@ -5,11 +5,11 @@ const path = require('path');
 const fs = require('fs');
 const { downloadArtifact } = require('@actions/artifact');
 
-const setupCli = require('./setup-cli');
-const setupAstGrep = require('./setup-ast-grep');
-const runFixSca = require('./run-fix-sca');
-const createPr = require('./create-pr');
-const postPrComment = require('./post-pr-comment');
+// const setupCli = require('./setup-cli');
+// const setupAstGrep = require('./setup-ast-grep');
+// const runFixSca = require('./run-fix-sca');
+// const createPr = require('./create-pr');
+// const postPrComment = require('./post-pr-comment');
 
 async function main() {
   try {

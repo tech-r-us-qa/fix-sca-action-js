@@ -28798,46 +28798,6 @@ module.exports = {
 
 /***/ }),
 
-/***/ 6045:
-/***/ ((module) => {
-
-module.exports = eval("require")("./create-pr");
-
-
-/***/ }),
-
-/***/ 6556:
-/***/ ((module) => {
-
-module.exports = eval("require")("./post-pr-comment");
-
-
-/***/ }),
-
-/***/ 8135:
-/***/ ((module) => {
-
-module.exports = eval("require")("./run-fix-sca");
-
-
-/***/ }),
-
-/***/ 4555:
-/***/ ((module) => {
-
-module.exports = eval("require")("./setup-ast-grep");
-
-
-/***/ }),
-
-/***/ 8824:
-/***/ ((module) => {
-
-module.exports = eval("require")("./setup-cli");
-
-
-/***/ }),
-
 /***/ 9491:
 /***/ ((module) => {
 
@@ -30759,11 +30719,11 @@ const path = __nccwpck_require__(1017);
 const fs = __nccwpck_require__(7147);
 const { downloadArtifact } = __nccwpck_require__(2605);
 
-const setupCli = __nccwpck_require__(8824);
-const setupAstGrep = __nccwpck_require__(4555);
-const runFixSca = __nccwpck_require__(8135);
-const createPr = __nccwpck_require__(6045);
-const postPrComment = __nccwpck_require__(6556);
+// const setupCli = require('./setup-cli');
+// const setupAstGrep = require('./setup-ast-grep');
+// const runFixSca = require('./run-fix-sca');
+// const createPr = require('./create-pr');
+// const postPrComment = require('./post-pr-comment');
 
 async function main() {
   try {
