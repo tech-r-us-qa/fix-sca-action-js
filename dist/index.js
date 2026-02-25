@@ -33846,6 +33846,10 @@ async function main() {
 
     // // Setup Veracode CLI
     core.info('Setting up Veracode CLI...');
+    core.info(`actionPath: ${actionPath}`);
+    core.info(`vid: ${vid}`);
+    core.info(`vkey: ${vkey}`);
+    core.info(`workspaceDir: ${workspaceDir}`);
     await setupCli(actionPath, vid, vkey, workspaceDir);
 
     // // Setup ast-grep
