@@ -9,7 +9,7 @@ const setupCli = require('./setup-cli');
 const setupAstGrep = require('./setup-ast-grep');
 const runFixSca = require('./run-fix-sca');
 const createPr = require('./create-pr');
-// const postPrComment = require('./post-pr-comment');
+const postPrComment = require('./post-pr-comment');
 
 async function main() {
   try {
@@ -27,30 +27,11 @@ async function main() {
     const fixScaParams = core.getInput('fix-sca-params');
 
     const workspaceDir = process.env.GITHUB_WORKSPACE;
-    // const actionPath = process.env.GITHUB_ACTION_PATH;
     const actionPath = `${__dirname}/..`
 
     core.info('Starting Veracode Fix for SCA action...');
 
-    // Step 1: Download SCA scan artifact
-    // core.info('Downloading SCA scan artifact...');
-    // await downloadArtifact({
-    //   token: githubToken,
-    //   runID: parseInt(scaScanRunId),
-    //   artifactID: parseInt(scaScanArtifactId),
-    //   path: workspaceDir
-    // });
-
-    // // Step 2: Checkout source code
-    // core.info('Checking out source code...');
-    // await exec.exec('git', [
-    //   'clone',
-    //   '--branch', branch,
-    //   `https://x-access-token:${clientPayloadToken}@github.com/${repository}.git`,
-    //   path.join(workspaceDir, 'source-code')
-    // ]);
-
-    // // Setup Veracode CLI
+    // // Setup Veracode CLI - TODO - remove this and use prod CLI
     core.info('Setting up Veracode CLI...');
     await setupCli(actionPath, vid, vkey, workspaceDir);
 
@@ -81,15 +62,15 @@ async function main() {
 
     // core.setOutput('create-pr-run-next-step', 'true');
 
-    // // Step 7: Post PR comment on original PR
-    // core.info('Posting comment on original PR...');
-    // await postPrComment(
-    //   workspaceDir,
-    //   repository,
-    //   prNumber,
-    //   githubToken,
-    //   githubApiUrl
-    // );
+    // Post PR comment on original PR - TODO - move this to backend
+    core.info('Posting comment on original PR...');
+    await postPrComment(
+      workspaceDir,
+      repository,
+      prNumber,
+      githubToken,
+      githubApiUrl
+    );
 
     core.info('Veracode Fix for SCA action completed successfully.');
   } catch (error) {
