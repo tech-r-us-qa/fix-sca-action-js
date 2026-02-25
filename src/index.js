@@ -8,7 +8,7 @@ const { downloadArtifact } = require('@actions/artifact');
 const setupCli = require('./setup-cli');
 const setupAstGrep = require('./setup-ast-grep');
 const runFixSca = require('./run-fix-sca');
-// const createPr = require('./create-pr');
+const createPr = require('./create-pr');
 // const postPrComment = require('./post-pr-comment');
 
 async function main() {
@@ -69,15 +69,15 @@ async function main() {
 
     // core.setOutput('run-next-step', 'true');
 
-    // // Step 6: Create Pull Request
-    // core.info('Creating pull request...');
-    // const prCreateOutput = await createPr(
-    //   workspaceDir,
-    //   repository,
-    //   branch,
-    //   githubToken,
-    //   githubApiUrl
-    // );
+    // Create Pull Request
+    core.info('Creating pull request...');
+    const prCreateOutput = await createPr(
+      workspaceDir,
+      repository,
+      branch,
+      githubToken,
+      githubApiUrl
+    );
 
     // core.setOutput('create-pr-run-next-step', 'true');
 
