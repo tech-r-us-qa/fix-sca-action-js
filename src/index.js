@@ -27,7 +27,8 @@ async function main() {
     const fixScaParams = core.getInput('fix-sca-params');
 
     const workspaceDir = process.env.GITHUB_WORKSPACE;
-    const actionPath = process.env.GITHUB_ACTION_PATH;
+    // const actionPath = process.env.GITHUB_ACTION_PATH;
+    const actionPath = `${__dirname}/..`
 
     core.info('Starting Veracode Fix for SCA action...');
 
@@ -56,8 +57,8 @@ async function main() {
     core.info(`vkey: ${vkey}`);
     core.info(`workspaceDir: ${workspaceDir}`);
 
-    str = JSON.stringify(process.env, null, 4)
-    core.info(`process.env: ${str}`);
+    // str = JSON.stringify(process.env, null, 4)
+    // core.info(`process.env: ${str}`);
     await setupCli(actionPath, vid, vkey, workspaceDir);
 
     // // Setup ast-grep
