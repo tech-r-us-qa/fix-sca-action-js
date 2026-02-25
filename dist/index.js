@@ -31740,7 +31740,7 @@ async function runFixSca(workspaceDir, actionPath, fixScaParams) {
       '--decouple', 'true'
     ];
 
-    if (fixScaParams && fixScaParams.trim()) {
+    if (fixScaParams && fixScaParams.trim() && fixScaParams !== 'SCA-*') {
       core.info(`Fix SCA params: ${fixScaParams}`);
       args.push('-i', fixScaParams);
     }
