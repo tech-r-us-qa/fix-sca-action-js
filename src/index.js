@@ -7,7 +7,7 @@ const { downloadArtifact } = require('@actions/artifact');
 
 const setupCli = require('./setup-cli');
 const setupAstGrep = require('./setup-ast-grep');
-// const runFixSca = require('./run-fix-sca');
+const runFixSca = require('./run-fix-sca');
 // const createPr = require('./create-pr');
 // const postPrComment = require('./post-pr-comment');
 
@@ -58,14 +58,14 @@ async function main() {
     core.info('Setting up ast-grep...');
     await setupAstGrep(actionPath);
 
-    // // Step 5: Run Fix for SCA
-    // core.info('Running Fix for SCA...');
-    // const fixScaOutput = await runFixSca(workspaceDir, actionPath, fixScaParams);
+    // Run Fix for SCA
+    core.info('Running Fix for SCA...');
+    const fixScaOutput = await runFixSca(workspaceDir, actionPath, fixScaParams);
     
-    // if (!fixScaOutput.hasChanges) {
-    //   core.info('No changes detected. Skipping PR creation.');
-    //   return;
-    // }
+    if (!fixScaOutput.hasChanges) {
+      core.info('No changes detected. Skipping PR creation.');
+      return;
+    }
 
     // core.setOutput('run-next-step', 'true');
 

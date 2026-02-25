@@ -31711,6 +31711,93 @@ function defaultCallback(err) {
 
 /***/ }),
 
+/***/ 4485:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const fs = __nccwpck_require__(7147);
+const path = __nccwpck_require__(1017);
+const os = __nccwpck_require__(2037);
+const core = __nccwpck_require__(2186);
+const exec = __nccwpck_require__(1514);
+
+async function runFixSca(workspaceDir, actionPath, fixScaParams) {
+  try {
+    const projectRootDir = '';
+    const projectPath = path.join(workspaceDir, 'source-code', projectRootDir);
+    const scaResultsFileName = 'scaResults.json';
+
+    // Set up environment for veracode CLI
+    const veracodeBinary = path.join(os.homedir(), 'veracode-cli-2', 'veracode');
+    const updatedPath = `${path.dirname(veracodeBinary)}:${process.env.PATH}`;
+
+    // Build command arguments
+    const args = [
+      'fix',
+      'sca',
+      projectPath,
+      '--results', path.join(workspaceDir, scaResultsFileName),
+      '--transitive',
+      '--decouple', 'true'
+    ];
+
+    if (fixScaParams && fixScaParams.trim()) {
+      core.info(`Fix SCA params: ${fixScaParams}`);
+      args.push('-i', fixScaParams);
+    }
+
+    // Run veracode fix sca command
+    core.info(`Running: ${veracodeBinary} ${args.join(' ')}`);
+    await exec.exec(veracodeBinary, args, {
+      env: { ...process.env, PATH: updatedPath }
+    });
+
+    // Check for changes in the repository
+    let hasChanges = false;
+    let gitDiffOutput = '';
+
+    try {
+      await exec.exec('git', ['diff', '--name-only', 'HEAD'], {
+        cwd: projectPath,
+        listeners: {
+          stdout: (data) => {
+            gitDiffOutput += data.toString();
+          }
+        }
+      });
+
+      if (gitDiffOutput.trim().length > 0) {
+        hasChanges = true;
+      }
+    } catch (error) {
+      core.warning(`Failed to check git diff: ${error.message}`);
+    }
+
+    if (!hasChanges) {
+      core.info('No changes to existing files detected. Skipping branch creation and PR.');
+      return { hasChanges: false };
+    }
+
+    // Show git diff
+    core.info('----- Git diff -----');
+    try {
+      await exec.exec('git', ['--no-pager', 'diff'], {
+        cwd: projectPath
+      });
+    } catch (error) {
+      core.warning(`Failed to show git diff: ${error.message}`);
+    }
+
+    return { hasChanges: true };
+  } catch (error) {
+    throw new Error(`Failed to run Fix for SCA: ${error.message}`);
+  }
+}
+
+module.exports = runFixSca;
+
+
+/***/ }),
+
 /***/ 1939:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -33803,7 +33890,7 @@ const { downloadArtifact } = __nccwpck_require__(2605);
 
 const setupCli = __nccwpck_require__(1296);
 const setupAstGrep = __nccwpck_require__(1939);
-// const runFixSca = require('./run-fix-sca');
+const runFixSca = __nccwpck_require__(4485);
 // const createPr = require('./create-pr');
 // const postPrComment = require('./post-pr-comment');
 
@@ -33854,14 +33941,14 @@ async function main() {
     core.info('Setting up ast-grep...');
     await setupAstGrep(actionPath);
 
-    // // Step 5: Run Fix for SCA
-    // core.info('Running Fix for SCA...');
-    // const fixScaOutput = await runFixSca(workspaceDir, actionPath, fixScaParams);
+    // Run Fix for SCA
+    core.info('Running Fix for SCA...');
+    const fixScaOutput = await runFixSca(workspaceDir, actionPath, fixScaParams);
     
-    // if (!fixScaOutput.hasChanges) {
-    //   core.info('No changes detected. Skipping PR creation.');
-    //   return;
-    // }
+    if (!fixScaOutput.hasChanges) {
+      core.info('No changes detected. Skipping PR creation.');
+      return;
+    }
 
     // core.setOutput('run-next-step', 'true');
 
