@@ -5,8 +5,8 @@ const path = require('path');
 const fs = require('fs');
 const { downloadArtifact } = require('@actions/artifact');
 
-// const setupCli = require('./setup-cli');
-// const setupAstGrep = require('./setup-ast-grep');
+const setupCli = require('./setup-cli');
+const setupAstGrep = require('./setup-ast-grep');
 // const runFixSca = require('./run-fix-sca');
 // const createPr = require('./create-pr');
 // const postPrComment = require('./post-pr-comment');
@@ -32,13 +32,13 @@ async function main() {
     core.info('Starting Veracode Fix for SCA action...');
 
     // Step 1: Download SCA scan artifact
-    core.info('Downloading SCA scan artifact...');
-    await downloadArtifact({
-      token: githubToken,
-      runID: parseInt(scaScanRunId),
-      artifactID: parseInt(scaScanArtifactId),
-      path: workspaceDir
-    });
+    // core.info('Downloading SCA scan artifact...');
+    // await downloadArtifact({
+    //   token: githubToken,
+    //   runID: parseInt(scaScanRunId),
+    //   artifactID: parseInt(scaScanArtifactId),
+    //   path: workspaceDir
+    // });
 
     // // Step 2: Checkout source code
     // core.info('Checking out source code...');
@@ -49,11 +49,11 @@ async function main() {
     //   path.join(workspaceDir, 'source-code')
     // ]);
 
-    // // Step 3: Setup Veracode CLI
-    // core.info('Setting up Veracode CLI...');
-    // await setupCli(actionPath, vid, vkey, workspaceDir);
+    // // Setup Veracode CLI
+    core.info('Setting up Veracode CLI...');
+    await setupCli(actionPath, vid, vkey, workspaceDir);
 
-    // // Step 4: Setup ast-grep
+    // // Setup ast-grep
     // core.info('Setting up ast-grep...');
     // await setupAstGrep(actionPath);
 
