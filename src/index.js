@@ -52,18 +52,11 @@ async function main() {
 
     // // Setup Veracode CLI
     core.info('Setting up Veracode CLI...');
-    core.info(`actionPath: ${actionPath}`);
-    core.info(`vid: ${vid}`);
-    core.info(`vkey: ${vkey}`);
-    core.info(`workspaceDir: ${workspaceDir}`);
-
-    // str = JSON.stringify(process.env, null, 4)
-    // core.info(`process.env: ${str}`);
     await setupCli(actionPath, vid, vkey, workspaceDir);
 
-    // // Setup ast-grep
-    // core.info('Setting up ast-grep...');
-    // await setupAstGrep(actionPath);
+    // Setup ast-grep
+    core.info('Setting up ast-grep...');
+    await setupAstGrep(actionPath);
 
     // // Step 5: Run Fix for SCA
     // core.info('Running Fix for SCA...');

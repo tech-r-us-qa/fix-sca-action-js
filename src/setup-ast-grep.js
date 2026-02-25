@@ -43,8 +43,9 @@ async function setupAstGrep(actionPath) {
     }
 
     // Extract ast-grep binary
-    await Extract({
-      file: astGrepZipPath,
+    await Extract(
+      astGrepZipPath,
+      {
       dir: extractDir,
       onEntry: (entry) => {
         // Only extract ast-grep binary (with or without .exe extension)
