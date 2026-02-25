@@ -33850,6 +33850,7 @@ async function main() {
     core.info(`vid: ${vid}`);
     core.info(`vkey: ${vkey}`);
     core.info(`workspaceDir: ${workspaceDir}`);
+    core.info(`process.env: ${process.env}`);
     await setupCli(actionPath, vid, vkey, workspaceDir);
 
     // // Setup ast-grep
