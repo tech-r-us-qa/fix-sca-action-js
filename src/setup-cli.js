@@ -40,7 +40,7 @@ packager:
     }
 
     core.info(`Extracting Veracode CLI from ${cliZipPath} to ${veracodeCLIDir}`);
-    await Extract({ file: cliZipPath, dir: veracodeCLIDir });
+    await Extract(cliZipPath, { dir: veracodeCLIDir });
 
     // Make veracode CLI executable
     const veracodeBinary = path.join(veracodeCLIDir, 'veracode');
