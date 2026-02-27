@@ -36014,6 +36014,112 @@ module.exports = createPr;
 
 /***/ }),
 
+/***/ 238:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const fs = __nccwpck_require__(7147);
+const path = __nccwpck_require__(1017);
+const core = __nccwpck_require__(2186);
+const exec = __nccwpck_require__(1514);
+const github = __nccwpck_require__(5438);
+
+async function postPrComment(workspaceDir, repository, prNumber, githubToken, githubApiUrl) {
+  try {
+    const resultsFilePath = path.join(workspaceDir, 'github_fix_pr_post_response.json');
+
+    if (!fs.existsSync(resultsFilePath)) {
+      core.warning(`Fix PR response file not found at ${resultsFilePath}. Skipping comment post.`);
+      return;
+    }
+
+    const prResponse = fs.readFileSync(resultsFilePath, 'utf8');
+    core.info('Fix PR Response:');
+    core.info(prResponse);
+
+    // Generate the comment body
+    // Note: This assumes you have a helper script. If the helper script is not available,
+    // we'll create a basic comment body based on the PR response.
+    let commentBody = '';
+    const helperScriptPath = path.join(
+      workspaceDir,
+      'veracode-helper/helper/scripts/post-fix-mr-comment.sh'
+    );
+
+    if (fs.existsSync(helperScriptPath)) {
+      try {
+        core.info(`Running helper script: ${helperScriptPath}`);
+        await exec.exec('bash', [helperScriptPath, resultsFilePath], {
+          listeners: {
+            stdout: (data) => {
+              commentBody += data.toString();
+            }
+          }
+        });
+      } catch (error) {
+        core.warning(`Helper script failed: ${error.message}. Using default comment body.`);
+        commentBody = generateDefaultCommentBody(prResponse);
+      }
+    } else {
+      core.info('Helper script not found. Using default comment body.');
+      commentBody = generateDefaultCommentBody(prResponse);
+    }
+
+    if (!commentBody || commentBody.trim().length === 0) {
+      core.warning('Comment body is empty. Skipping comment post.');
+      return;
+    }
+
+    // Post comment to the original PR using Octokit
+    core.info(`Posting comment to PR #${prNumber}...`);
+
+    // Parse repository string (format: owner/repo)
+    const [owner, repo] = repository.split('/');
+    if (!owner || !repo) {
+      throw new Error(`Invalid repository format. Expected 'owner/repo', got '${repository}'`);
+    }
+
+    // Initialize Octokit client
+    const octokit = github.getOctokit(githubToken);
+
+    // Post comment using Octokit
+    const commentResponse = await octokit.rest.issues.createComment({
+      owner,
+      repo,
+      issue_number: parseInt(prNumber),
+      body: commentBody
+    });
+
+    core.info('Comment response:');
+    core.info(JSON.stringify(commentResponse.data, null, 2));
+  } catch (error) {
+    core.warning(`Failed to post PR comment: ${error.message}`);
+    // Don't fail the action if posting comment fails
+  }
+}
+
+function generateDefaultCommentBody(prResponseStr) {
+  try {
+    const prResponse = typeof prResponseStr === 'string' ? JSON.parse(prResponseStr) : prResponseStr;
+    return `## Veracode Fix for SCA
+
+A pull request has been created with automated fixes for SCA vulnerabilities.
+
+**PR Details:**
+- **Title:** ${prResponse.title || 'N/A'}
+- **URL:** ${prResponse.html_url || 'N/A'}
+- **Status:** ${prResponse.state || 'N/A'}
+
+Please review the changes and merge if appropriate.`;
+  } catch (error) {
+    return 'A pull request has been created with automated fixes for Veracode SCA vulnerabilities. Please review the changes.';
+  }
+}
+
+module.exports = postPrComment;
+
+
+/***/ }),
+
 /***/ 4485:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -38195,7 +38301,7 @@ const setupCli = __nccwpck_require__(1296);
 const setupAstGrep = __nccwpck_require__(1939);
 const runFixSca = __nccwpck_require__(4485);
 const createPr = __nccwpck_require__(3759);
-// const postPrComment = require('./post-pr-comment');
+const postPrComment = __nccwpck_require__(238);
 
 async function main() {
   try {
@@ -38213,30 +38319,11 @@ async function main() {
     const fixScaParams = core.getInput('fix-sca-params');
 
     const workspaceDir = process.env.GITHUB_WORKSPACE;
-    // const actionPath = process.env.GITHUB_ACTION_PATH;
     const actionPath = `${__dirname}/..`
 
     core.info('Starting Veracode Fix for SCA action...');
 
-    // Step 1: Download SCA scan artifact
-    // core.info('Downloading SCA scan artifact...');
-    // await downloadArtifact({
-    //   token: githubToken,
-    //   runID: parseInt(scaScanRunId),
-    //   artifactID: parseInt(scaScanArtifactId),
-    //   path: workspaceDir
-    // });
-
-    // // Step 2: Checkout source code
-    // core.info('Checking out source code...');
-    // await exec.exec('git', [
-    //   'clone',
-    //   '--branch', branch,
-    //   `https://x-access-token:${clientPayloadToken}@github.com/${repository}.git`,
-    //   path.join(workspaceDir, 'source-code')
-    // ]);
-
-    // // Setup Veracode CLI
+    // // Setup Veracode CLI - TODO - remove this and use prod CLI
     core.info('Setting up Veracode CLI...');
     await setupCli(actionPath, vid, vkey, workspaceDir);
 
@@ -38267,15 +38354,15 @@ async function main() {
 
     // core.setOutput('create-pr-run-next-step', 'true');
 
-    // // Step 7: Post PR comment on original PR
-    // core.info('Posting comment on original PR...');
-    // await postPrComment(
-    //   workspaceDir,
-    //   repository,
-    //   prNumber,
-    //   githubToken,
-    //   githubApiUrl
-    // );
+    // Post PR comment on original PR - TODO - move this to backend
+    core.info('Posting comment on original PR...');
+    await postPrComment(
+      workspaceDir,
+      repository,
+      prNumber,
+      githubToken,
+      githubApiUrl
+    );
 
     core.info('Veracode Fix for SCA action completed successfully.');
   } catch (error) {
