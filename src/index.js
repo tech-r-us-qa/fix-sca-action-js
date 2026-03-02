@@ -9,7 +9,7 @@ const setupCli = require('./setup-cli');
 const setupAstGrep = require('./setup-ast-grep');
 const runFixSca = require('./run-fix-sca');
 const createPr = require('./create-pr');
-// const postPrComment = require('./post-pr-comment');
+const postPrComment = require('./post-pr-comment');
 
 async function main() {
   try {
@@ -81,15 +81,15 @@ async function main() {
 
     // core.setOutput('create-pr-run-next-step', 'true');
 
-    // // Step 7: Post PR comment on original PR
-    // core.info('Posting comment on original PR...');
-    // await postPrComment(
-    //   workspaceDir,
-    //   repository,
-    //   prNumber,
-    //   githubToken,
-    //   githubApiUrl
-    // );
+    // Post PR comment on original PR
+    core.info('Posting comment on original PR...');
+    await postPrComment(
+      workspaceDir,
+      repository,
+      prNumber,
+      githubToken,
+      githubApiUrl
+    );
 
     core.info('Veracode Fix for SCA action completed successfully.');
   } catch (error) {
