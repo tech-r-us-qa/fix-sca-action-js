@@ -56,16 +56,16 @@ async function postPrComment(workspaceDir, repository, prNumber, githubToken, gi
 function generateDefaultCommentBody(prResponseStr) {
   try {
     const prResponse = typeof prResponseStr === 'string' ? JSON.parse(prResponseStr) : prResponseStr;
-    return `## Veracode Fix for SCA
+    return `## Veracode Fix for SCA - Pull Request Created
+**PR:** ${prResponse.html_url || 'N/A'}
 
-A pull request has been created with automated fixes for SCA vulnerabilities.
+This PR contains updates for vulnerable dependencies.
 
-**PR Details:**
-- **Title:** ${prResponse.title || 'N/A'}
-- **URL:** ${prResponse.html_url || 'N/A'}
-- **Status:** ${prResponse.state || 'N/A'}
-
-Please review the changes and merge if appropriate.`;
+### Next Steps:
+1. Review the changes in the Fix for SCA PR.
+2. Verify that tests pass.
+3. Merge the MR to apply the dependency updates.
+4. Re-run the SCA scan to verify the fixes.`;
   } catch (error) {
     return 'A pull request has been created with automated fixes for Veracode SCA vulnerabilities. Please review the changes.';
   }
