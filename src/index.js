@@ -9,7 +9,7 @@ const setupCli = require('./setup-cli');
 const setupAstGrep = require('./setup-ast-grep');
 const runFixSca = require('./run-fix-sca');
 const createPr = require('./create-pr');
-const postPrComment = require('./post-pr-comment');
+const uploadPrComment = require('./upload-pr-comment');
 
 async function main() {
   try {
@@ -82,7 +82,7 @@ async function main() {
 
     // Post PR comment on original PR
     core.info('Posting comment on original PR...');
-    await postPrComment(
+    await uploadPrComment(
       workspaceDir,
       repository,
       prNumber,

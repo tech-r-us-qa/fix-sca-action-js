@@ -93,7 +93,7 @@ async function createPr(workspaceDir, repository, sourceBranch, githubToken, git
     core.info('Github PR Post Response');
     core.info(JSON.stringify(prResponse.data, null, 2));
 
-    // Save response to file for use in post-pr-comment step
+    // Save response to file for use in upload-pr-comment step
     const responseFilePath = path.join(workspaceDir, 'github_fix_pr_post_response.json');
     fs.writeFileSync(responseFilePath, JSON.stringify(prResponse.data, null, 2));
 

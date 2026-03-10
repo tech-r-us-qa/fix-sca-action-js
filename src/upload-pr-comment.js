@@ -5,7 +5,7 @@ const exec = require('@actions/exec');
 const github = require('@actions/github');
 const artifact = require('@actions/artifact');
 
-async function postPrComment(workspaceDir, repository, prNumber, githubToken, githubApiUrl) {
+async function uploadPrComment(workspaceDir, repository, prNumber, githubToken, githubApiUrl) {
   try {
     const resultsFilePath = path.join(workspaceDir, 'github_fix_pr_post_response.json');
 
@@ -79,4 +79,4 @@ This PR contains updates for vulnerable dependencies.
   }
 }
 
-module.exports = postPrComment;
+module.exports = uploadPrComment;

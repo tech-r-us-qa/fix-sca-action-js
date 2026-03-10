@@ -35999,7 +35999,7 @@ async function createPr(workspaceDir, repository, sourceBranch, githubToken, git
     core.info('Github PR Post Response');
     core.info(JSON.stringify(prResponse.data, null, 2));
 
-    // Save response to file for use in post-pr-comment step
+    // Save response to file for use in upload-pr-comment step
     const responseFilePath = path.join(workspaceDir, 'github_fix_pr_post_response.json');
     fs.writeFileSync(responseFilePath, JSON.stringify(prResponse.data, null, 2));
 
@@ -36010,87 +36010,6 @@ async function createPr(workspaceDir, repository, sourceBranch, githubToken, git
 }
 
 module.exports = createPr;
-
-
-/***/ }),
-
-/***/ 238:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-const fs = __nccwpck_require__(7147);
-const path = __nccwpck_require__(1017);
-const core = __nccwpck_require__(2186);
-const exec = __nccwpck_require__(1514);
-const github = __nccwpck_require__(5438);
-
-async function postPrComment(workspaceDir, repository, prNumber, githubToken, githubApiUrl) {
-  try {
-    const resultsFilePath = path.join(workspaceDir, 'github_fix_pr_post_response.json');
-
-    if (!fs.existsSync(resultsFilePath)) {
-      core.warning(`Fix PR response file not found at ${resultsFilePath}. Skipping comment post.`);
-      return;
-    }
-
-    const prResponse = fs.readFileSync(resultsFilePath, 'utf8');
-    core.info('Fix PR Response:');
-    core.info(prResponse);
-
-    // Generate the comment body
-    let commentBody = generateDefaultCommentBody(prResponse);    
-
-    if (!commentBody || commentBody.trim().length === 0) {
-      core.warning('Comment body is empty. Skipping comment post.');
-      return;
-    }
-
-    // Post comment to the original PR using Octokit
-    core.info(`Posting comment to PR #${prNumber}...`);
-
-    // Parse repository string (format: owner/repo)
-    const [owner, repo] = repository.split('/');
-    if (!owner || !repo) {
-      throw new Error(`Invalid repository format. Expected 'owner/repo', got '${repository}'`);
-    }
-
-    // Initialize Octokit client
-    const octokit = github.getOctokit(githubToken);
-
-    // Post comment using Octokit
-    const commentResponse = await octokit.rest.issues.createComment({
-      owner,
-      repo,
-      issue_number: parseInt(prNumber),
-      body: commentBody
-    });
-
-    core.info('Comment response:');
-    core.info(JSON.stringify(commentResponse.data, null, 2));
-  } catch (error) {
-    core.warning(`Failed to post PR comment: ${error.message}`);
-    // Don't fail the action if posting comment fails
-  }
-}
-
-function generateDefaultCommentBody(prResponseStr) {
-  try {
-    const prResponse = typeof prResponseStr === 'string' ? JSON.parse(prResponseStr) : prResponseStr;
-    return `## Veracode Fix for SCA - Pull Request Created
-**PR:** ${prResponse.html_url || 'N/A'}
-
-This PR contains updates for vulnerable dependencies.
-
-### Next Steps:
-1. Review the changes in the Fix for SCA PR.
-2. Verify that tests pass.
-3. Merge the MR to apply the dependency updates.
-4. Re-run the SCA scan to verify the fixes.`;
-  } catch (error) {
-    return 'A pull request has been created with automated fixes for Veracode SCA vulnerabilities. Please review the changes.';
-  }
-}
-
-module.exports = postPrComment;
 
 
 /***/ }),
@@ -36331,6 +36250,95 @@ packager:
 }
 
 module.exports = setupCli;
+
+
+/***/ }),
+
+/***/ 6681:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const fs = __nccwpck_require__(7147);
+const path = __nccwpck_require__(1017);
+const core = __nccwpck_require__(2186);
+const exec = __nccwpck_require__(1514);
+const github = __nccwpck_require__(5438);
+const artifact = __nccwpck_require__(2605);
+
+async function uploadPrComment(workspaceDir, repository, prNumber, githubToken, githubApiUrl) {
+  try {
+    const resultsFilePath = path.join(workspaceDir, 'github_fix_pr_post_response.json');
+
+    if (!fs.existsSync(resultsFilePath)) {
+      core.warning(`Fix PR response file not found at ${resultsFilePath}. Skipping comment post.`);
+      return;
+    }
+
+    const prResponse = fs.readFileSync(resultsFilePath, 'utf8');
+    core.info('Fix PR Response:');
+    core.info(prResponse);
+
+    // Generate the comment body
+    let commentBody = generateDefaultCommentBody(prResponse);    
+
+    if (!commentBody || commentBody.trim().length === 0) {
+      core.warning('Comment body is empty. Skipping comment post.');
+      return;
+    }
+
+    core.info(`Upload comment to PR #${prNumber} as an artifact...`);
+
+    // Parse repository string (format: owner/repo)
+    const [owner, repo] = repository.split('/');
+    if (!owner || !repo) {
+      throw new Error(`Invalid repository format. Expected 'owner/repo', got '${repository}'`);
+    }
+
+    // Upload PR comment data as artifact
+    const artifactData = {
+      repository_owner: owner,
+      repository_name: repo,
+      issue_number: parseInt(prNumber),
+      body: commentBody
+    };
+
+    const artifactFilePath = path.join(workspaceDir, 'veracode-cli.pr-comment.json');
+    fs.writeFileSync(artifactFilePath, JSON.stringify(artifactData, null, 2));
+
+    const artifactClient = artifact.create();
+    const artifactName = 'veracode-cli.pr-comment-json';
+    const uploadResponse = await artifactClient.uploadArtifact(
+      artifactName,
+      [artifactFilePath],
+      workspaceDir,
+      { continueOnError: false }
+    );
+
+    core.info(`Artifact uploaded successfully: ${uploadResponse.artifactName}`);
+  } catch (artifactError) {
+    core.warning(`Failed to upload artifact: ${artifactError.message}`);
+    // Don't fail the action if uploading fails
+  }
+}
+
+function generateDefaultCommentBody(prResponseStr) {
+  try {
+    const prResponse = typeof prResponseStr === 'string' ? JSON.parse(prResponseStr) : prResponseStr;
+    return `## Veracode Fix for SCA - Pull Request Created
+**PR:** ${prResponse.html_url || 'N/A'}
+
+This PR contains updates for vulnerable dependencies.
+
+### Next Steps:
+1. Review the changes in the Fix for SCA PR.
+2. Verify that tests pass.
+3. Merge the MR to apply the dependency updates.
+4. Re-run the SCA scan to verify the fixes.`;
+  } catch (error) {
+    return 'A pull request has been created with automated fixes for Veracode SCA vulnerabilities. Please review the changes.';
+  }
+}
+
+module.exports = uploadPrComment;
 
 
 /***/ }),
@@ -38276,7 +38284,7 @@ const setupCli = __nccwpck_require__(1296);
 const setupAstGrep = __nccwpck_require__(1939);
 const runFixSca = __nccwpck_require__(4485);
 const createPr = __nccwpck_require__(3759);
-const postPrComment = __nccwpck_require__(238);
+const uploadPrComment = __nccwpck_require__(6681);
 
 async function main() {
   try {
@@ -38286,7 +38294,6 @@ async function main() {
     const scaScanArtifactId = core.getInput('sca-scan-artifact-id');
     const repository = core.getInput('repository');
     const branch = core.getInput('branch');
-    const clientPayloadToken = core.getInput('client-payload-token');
     const githubApiUrl = core.getInput('github-api-url');
     const prNumber = core.getInput('pr-number');
     const vid = core.getInput('vid');
@@ -38350,7 +38357,7 @@ async function main() {
 
     // Post PR comment on original PR
     core.info('Posting comment on original PR...');
-    await postPrComment(
+    await uploadPrComment(
       workspaceDir,
       repository,
       prNumber,
