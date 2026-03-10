@@ -32975,7 +32975,7 @@ async function runFixSca(workspaceDir, actionPath, fixScaParams) {
     }
 
     core.info(`Running path`);
-    await exec.exec('echo $PATH');
+    await exec.exec('echo', '$PATH');
 
     // Run veracode fix sca command
     core.info(`Running: ${veracodeBinary} ${args.join(' ')}`);
@@ -35129,8 +35129,8 @@ async function main() {
     const branch = core.getInput('branch');
     const githubApiUrl = core.getInput('github-api-url');
     const prNumber = core.getInput('pr-number');
-    const vid = core.getInput('vid');
-    const vkey = core.getInput('vkey');
+    // const vid = core.getInput('vid');
+    // const vkey = core.getInput('vkey');
     const fixScaParams = core.getInput('fix-sca-params');
 
     const workspaceDir = process.env.GITHUB_WORKSPACE;
