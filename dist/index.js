@@ -36511,7 +36511,7 @@ packager:
     // Extract Veracode CLI
     // Find the veracode-cli tar.gz file (version may vary)
     // The file is checked out to veracode-helper directory via GitHub action
-    const cliPattern = path.join(workspaceDir, 'veracode-helper', 'veracode-cli_*.tar.gz');
+    const cliPattern = path.join(workspaceDir, 'veracode-helper', 'helper', 'cli', 'veracode-cli_*.tar.gz');
     const cliFiles = glob.sync(cliPattern);
 
     if (cliFiles.length === 0) {
