@@ -19,7 +19,6 @@ async function main() {
     const scaScanArtifactId = core.getInput('sca-scan-artifact-id');
     const repository = core.getInput('repository');
     const branch = core.getInput('branch');
-    const clientPayloadToken = core.getInput('client-payload-token');
     const githubApiUrl = core.getInput('github-api-url');
     const prNumber = core.getInput('pr-number');
     const vid = core.getInput('vid');
