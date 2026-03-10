@@ -36200,7 +36200,7 @@ const path = __nccwpck_require__(1017);
 const os = __nccwpck_require__(2037);
 const core = __nccwpck_require__(2186);
 const exec = __nccwpck_require__(1514);
-const Extract = __nccwpck_require__(460);
+const glob = __nccwpck_require__(1610);
 
 async function setupCli(actionPath, vid, vkey, workspaceDir) {
   try {
@@ -36229,15 +36229,24 @@ packager:
     core.info(`Created Veracode configuration at ${configPath}`);
 
     // Extract Veracode CLI
-    const cliZipPath = path.join(actionPath, 'cli', 'veracode.zip');
+    // Find the veracode-cli tar.gz file (version may vary)
+    // The file is checked out to veracode-helper directory via GitHub action
+    const cliPattern = path.join(workspaceDir, 'veracode-helper', 'veracode-cli_*.tar.gz');
+    const cliFiles = glob.sync(cliPattern);
+
+    if (cliFiles.length === 0) {
+      throw new Error(`No veracode-cli tar.gz file found matching pattern: ${cliPattern}`);
+    }
+
+    const cliTarPath = cliFiles[0];
     const veracodeCLIDir = path.join(os.homedir(), 'veracode-cli-2');
 
     if (!fs.existsSync(veracodeCLIDir)) {
       fs.mkdirSync(veracodeCLIDir, { recursive: true });
     }
 
-    core.info(`Extracting Veracode CLI from ${cliZipPath} to ${veracodeCLIDir}`);
-    await Extract(cliZipPath, { dir: veracodeCLIDir });
+    core.info(`Extracting Veracode CLI from ${cliTarPath} to ${veracodeCLIDir}`);
+    await exec.exec('tar', ['-xzf', cliTarPath, '-C', veracodeCLIDir]);
 
     // Make veracode CLI executable
     const veracodeBinary = path.join(veracodeCLIDir, 'veracode');
@@ -36339,6 +36348,14 @@ This PR contains updates for vulnerable dependencies.
 }
 
 module.exports = uploadPrComment;
+
+
+/***/ }),
+
+/***/ 1610:
+/***/ ((module) => {
+
+module.exports = eval("require")("glob");
 
 
 /***/ }),
