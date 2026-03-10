@@ -3,6 +3,7 @@ const path = require('path');
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 const github = require('@actions/github');
+const artifact = require('@actions/artifact');
 
 async function postPrComment(workspaceDir, repository, prNumber, githubToken, githubApiUrl) {
   try {
@@ -25,8 +26,7 @@ async function postPrComment(workspaceDir, repository, prNumber, githubToken, gi
       return;
     }
 
-    // Post comment to the original PR using Octokit
-    core.info(`Posting comment to PR #${prNumber}...`);
+    core.info(`Upload comment to PR #${prNumber} as an artifact...`);
 
     // Parse repository string (format: owner/repo)
     const [owner, repo] = repository.split('/');
@@ -34,22 +34,30 @@ async function postPrComment(workspaceDir, repository, prNumber, githubToken, gi
       throw new Error(`Invalid repository format. Expected 'owner/repo', got '${repository}'`);
     }
 
-    // Initialize Octokit client
-    const octokit = github.getOctokit(githubToken);
-
-    // Post comment using Octokit
-    const commentResponse = await octokit.rest.issues.createComment({
-      owner,
-      repo,
+    // Upload PR comment data as artifact
+    const artifactData = {
+      repository_owner: owner,
+      repository_name: repo,
       issue_number: parseInt(prNumber),
       body: commentBody
-    });
+    };
 
-    core.info('Comment response:');
-    core.info(JSON.stringify(commentResponse.data, null, 2));
-  } catch (error) {
-    core.warning(`Failed to post PR comment: ${error.message}`);
-    // Don't fail the action if posting comment fails
+    const artifactFilePath = path.join(workspaceDir, 'veracode-cli.pr-comment.json');
+    fs.writeFileSync(artifactFilePath, JSON.stringify(artifactData, null, 2));
+
+    const artifactClient = artifact.create();
+    const artifactName = 'veracode-cli.pr-comment-json';
+    const uploadResponse = await artifactClient.uploadArtifact(
+      artifactName,
+      [artifactFilePath],
+      workspaceDir,
+      { continueOnError: false }
+    );
+
+    core.info(`Artifact uploaded successfully: ${uploadResponse.artifactName}`);
+  } catch (artifactError) {
+    core.warning(`Failed to upload artifact: ${artifactError.message}`);
+    // Don't fail the action if uploading fails
   }
 }
 
