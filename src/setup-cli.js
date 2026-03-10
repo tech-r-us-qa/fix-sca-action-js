@@ -49,7 +49,7 @@ packager:
     }
 
     core.info(`Extracting Veracode CLI from ${cliTarPath} to ${veracodeCLIDir}`);
-    await exec.exec('tar', ['-xzf', cliTarPath, '-C', veracodeCLIDir]);
+    await exec.exec('tar', ['-xzf', cliTarPath, '-C', veracodeCLIDir, '--strip-components=1']);
 
     // Make veracode CLI executable
     const veracodeBinary = path.join(veracodeCLIDir, 'veracode');
