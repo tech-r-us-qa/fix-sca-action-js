@@ -16,8 +16,8 @@ async function setupCli(actionPath, vid, vkey, workspaceDir) {
     // Create veracode.yml configuration file
     const configPath = path.join(veracodeDir, 'veracode.yml');
     const configContent = `api:
-    key-id: ${vid}
-    key-secret: ${vkey}
+    key-id: ${process.env.VERACODE_API_KEY_ID}
+    key-secret: ${process.env.VERACODE_API_KEY_SECRET}
 oauth:
     enabled: false
     region: ""
