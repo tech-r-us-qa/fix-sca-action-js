@@ -32974,8 +32974,15 @@ async function runFixSca(workspaceDir, actionPath, fixScaParams) {
       args.push('-i', fixScaParams);
     }
 
-    core.info(`Running path`);
-    await exec.exec('echo', '$PATH');
+    core.info(`Print path`);
+    await exec.exec('echo', '$PATH', {
+      env: { ...process.env }
+    });
+
+    core.info(`Print env var`);
+    await exec.exec('printenv', '', {
+      env: { ...process.env }
+    });
 
     // Run veracode fix sca command
     core.info(`Running: ${veracodeBinary} ${args.join(' ')}`);
