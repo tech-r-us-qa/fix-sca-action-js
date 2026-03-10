@@ -46,7 +46,7 @@ async function uploadPrComment(workspaceDir, repository, prNumber, githubToken, 
     fs.writeFileSync(artifactFilePath, JSON.stringify(artifactData, null, 2));
 
     const artifactClient = artifact.create();
-    const artifactName = 'veracode-cli.pr-comment-json';
+    const artifactName = 'veracode-cli-pr-comment-json';
     const uploadResponse = await artifactClient.uploadArtifact(
       artifactName,
       [artifactFilePath],
