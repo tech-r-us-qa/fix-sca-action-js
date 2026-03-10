@@ -33138,7 +33138,7 @@ const core = __nccwpck_require__(2186);
 const exec = __nccwpck_require__(1514);
 const Extract = __nccwpck_require__(460);
 
-async function setupCli(actionPath, vid, vkey, workspaceDir) {
+async function setupCli() {
   try {
     // Create .veracode directory
     const veracodeDir = path.join(os.homedir(), '.veracode');
@@ -35147,7 +35147,7 @@ async function main() {
 
     // // Setup Veracode CLI
     core.info('Setting up Veracode CLI...');
-    await setupCli(actionPath, vid, vkey, workspaceDir);
+    await setupCli();
 
     // Setup ast-grep
     core.info('Setting up ast-grep...');

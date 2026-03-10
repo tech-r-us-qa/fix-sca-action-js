@@ -5,7 +5,7 @@ const core = require('@actions/core');
 const exec = require('@actions/exec');
 const Extract = require('extract-zip');
 
-async function setupCli(actionPath, vid, vkey, workspaceDir) {
+async function setupCli() {
   try {
     // Create .veracode directory
     const veracodeDir = path.join(os.homedir(), '.veracode');
