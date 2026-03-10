@@ -33164,20 +33164,20 @@ packager:
     fs.writeFileSync(configPath, configContent);
     core.info(`Created Veracode configuration at ${configPath}`);
 
-    // Extract Veracode CLI
-    const cliZipPath = path.join(actionPath, 'cli', 'veracode.zip');
-    const veracodeCLIDir = path.join(os.homedir(), 'veracode-cli-2');
+    // // Extract Veracode CLI
+    // const cliZipPath = path.join(actionPath, 'cli', 'veracode.zip');
+    // const veracodeCLIDir = path.join(os.homedir(), 'veracode-cli-2');
 
-    if (!fs.existsSync(veracodeCLIDir)) {
-      fs.mkdirSync(veracodeCLIDir, { recursive: true });
-    }
+    // if (!fs.existsSync(veracodeCLIDir)) {
+    //   fs.mkdirSync(veracodeCLIDir, { recursive: true });
+    // }
 
-    core.info(`Extracting Veracode CLI from ${cliZipPath} to ${veracodeCLIDir}`);
-    await Extract(cliZipPath, { dir: veracodeCLIDir });
+    // core.info(`Extracting Veracode CLI from ${cliZipPath} to ${veracodeCLIDir}`);
+    // await Extract(cliZipPath, { dir: veracodeCLIDir });
 
-    // Make veracode CLI executable
-    const veracodeBinary = path.join(veracodeCLIDir, 'veracode');
-    fs.chmodSync(veracodeBinary, 0o755);
+    // // Make veracode CLI executable
+    // const veracodeBinary = path.join(veracodeCLIDir, 'veracode');
+    // fs.chmodSync(veracodeBinary, 0o755);
 
     core.info('Veracode CLI setup completed successfully');
   } catch (error) {
@@ -35146,8 +35146,8 @@ async function main() {
     core.info('Starting Veracode Fix for SCA action...');
 
     // // Setup Veracode CLI
-    // core.info('Setting up Veracode CLI...');
-    // await setupCli(actionPath, vid, vkey, workspaceDir);
+    core.info('Setting up Veracode CLI...');
+    await setupCli(actionPath, vid, vkey, workspaceDir);
 
     // Setup ast-grep
     core.info('Setting up ast-grep...');
