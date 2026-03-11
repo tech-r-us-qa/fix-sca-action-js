@@ -32,11 +32,6 @@ async function runFixSca(workspaceDir, actionPath, fixScaParams) {
       env: { ...process.env }
     });
 
-    core.info(`Print veracode.yml`);
-    await exec.exec('cat', '~/.veracode/veracode.yml', {
-      env: { ...process.env }
-    });
-
     // Run veracode fix sca command
     core.info(`Running: ${veracodeBinary} ${args.join(' ')}`);
     await exec.exec(veracodeBinary, args, {
