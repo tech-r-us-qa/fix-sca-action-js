@@ -36027,7 +36027,6 @@ async function runFixSca(workspaceDir, actionPath, fixScaParams) {
   try {
     const projectRootDir = '';
     const projectPath = path.join(workspaceDir, 'source-code', projectRootDir);
-    const scaResultsFileName = 'scaResults.json';
 
     // Set up environment for veracode CLI
     const veracodeBinary =  path.join(`${process.env.CLI_PATH}`, 'veracode'); 
@@ -36036,7 +36035,7 @@ async function runFixSca(workspaceDir, actionPath, fixScaParams) {
       'fix',
       'sca',
       projectPath,
-      '--results', path.join(workspaceDir, scaResultsFileName),
+      '--results', path.join(workspaceDir, 'veracode_artifact_directory', 'scaResults.json'),
       '--transitive',
       '--decouple', 'true'
     ];
