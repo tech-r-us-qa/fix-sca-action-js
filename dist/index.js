@@ -36298,8 +36298,8 @@ async function uploadPrComment(workspaceDir, repository, prNumber, githubToken, 
     core.info(artifactName)
     core.info(artifactFilePath)
     core.info(workspaceDir)
-    core.info('== Start upload ==')
 
+    core.info('== Start upload ==')
     const artifactClient = artifact.create();
     const artifactName = 'veracode-cli-pr-comment-json';
     const uploadResponse = await artifactClient.uploadArtifact(
