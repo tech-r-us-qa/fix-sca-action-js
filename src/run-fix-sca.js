@@ -11,9 +11,7 @@ async function runFixSca(workspaceDir, actionPath, fixScaParams) {
     const scaResultsFileName = 'scaResults.json';
 
     // Set up environment for veracode CLI
-    const veracodeBinary = path.join(os.homedir(), 'veracode-cli-2', 'veracode');
-    const updatedPath = `${path.dirname(veracodeBinary)}:${process.env.PATH}`;
-
+    const veracodeBinary =  path.join(`${process.env.CLI_PATH}`, 'veracode'); 
     // Build command arguments
     const args = [
       'fix',
@@ -32,7 +30,7 @@ async function runFixSca(workspaceDir, actionPath, fixScaParams) {
     // Run veracode fix sca command
     core.info(`Running: ${veracodeBinary} ${args.join(' ')}`);
     await exec.exec(veracodeBinary, args, {
-      env: { ...process.env, PATH: updatedPath }
+      env: { ...process.env }
     });
 
     // Check for changes in the repository

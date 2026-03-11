@@ -2,10 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const core = require('@actions/core');
-const exec = require('@actions/exec');
-const glob = require('glob');
 
-async function setupCli(actionPath, vid, vkey, workspaceDir) {
+async function setupCli(vid, vkey) {
   try {
     // Create .veracode directory
     const veracodeDir = path.join(os.homedir(), '.veracode');
@@ -30,30 +28,6 @@ packager:
 
     fs.writeFileSync(configPath, configContent);
     core.info(`Created Veracode configuration at ${configPath}`);
-
-    // Extract Veracode CLI
-    // Find the veracode-cli tar.gz file (version may vary)
-    // The file is checked out to veracode-helper directory via GitHub action
-    const cliPattern = path.join(workspaceDir, 'veracode-helper', 'helper', 'cli', 'veracode-cli_*.tar.gz');
-    const cliFiles = glob.sync(cliPattern);
-
-    if (cliFiles.length === 0) {
-      throw new Error(`No veracode-cli tar.gz file found matching pattern: ${cliPattern}`);
-    }
-
-    const cliTarPath = cliFiles[0];
-    const veracodeCLIDir = path.join(os.homedir(), 'veracode-cli-2');
-
-    if (!fs.existsSync(veracodeCLIDir)) {
-      fs.mkdirSync(veracodeCLIDir, { recursive: true });
-    }
-
-    core.info(`Extracting Veracode CLI from ${cliTarPath} to ${veracodeCLIDir}`);
-    await exec.exec('tar', ['-xzf', cliTarPath, '-C', veracodeCLIDir, '--strip-components=1']);
-
-    // Make veracode CLI executable
-    const veracodeBinary = path.join(veracodeCLIDir, 'veracode');
-    fs.chmodSync(veracodeBinary, 0o755);
 
     core.info('Veracode CLI setup completed successfully');
   } catch (error) {
