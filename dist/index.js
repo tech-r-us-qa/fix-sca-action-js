@@ -36295,7 +36295,6 @@ async function uploadPrComment(workspaceDir, repository, prNumber, githubToken, 
     core.info('=== Content of veracode-cli.pr-comment.json ===');
     const fileContent = fs.readFileSync(artifactFilePath, 'utf8');
     core.info(fileContent);
-    core.info(artifactName)
     core.info(artifactFilePath)
     core.info(workspaceDir)
 
