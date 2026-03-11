@@ -42,8 +42,28 @@ async function uploadPrComment(workspaceDir, repository, prNumber, githubToken, 
       body: commentBody
     };
 
-    const artifactFilePath = path.join(workspaceDir, 'veracode-cli.pr-comment.json');
+    const artifactDir = path.join(workspaceDir, 'veracode_artifact_directory');
+    fs.mkdirSync(artifactDir, { recursive: true });
+    const artifactFilePath = path.join(artifactDir, 'veracode-cli.pr-comment.json');
     fs.writeFileSync(artifactFilePath, JSON.stringify(artifactData, null, 2));
+
+    // Recursively print all files and directories
+    core.info('=== Directory structure ===');
+    function printDirectoryRecursive(dir, indent = '') {
+      const items = fs.readdirSync(dir, { withFileTypes: true });
+      items.forEach(item => {
+        const fullPath = path.join(dir, item.name);
+        if (item.isDirectory()) {
+          core.info(`${indent}[DIR] ${item.name}/`);
+          printDirectoryRecursive(fullPath, indent + '  ');
+        } else {
+          const stats = fs.statSync(fullPath);
+          core.info(`${indent}[FILE] ${item.name} (${stats.size} bytes)`);
+        }
+      });
+    }
+    printDirectoryRecursive(workspaceDir);
+    core.info('=== End directory structure ===');
 
     const artifactClient = artifact.create();
     const artifactName = 'veracode-cli-pr-comment-json';
