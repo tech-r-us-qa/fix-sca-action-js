@@ -38290,8 +38290,8 @@ async function main() {
     core.info('Starting Veracode Fix for SCA action...');
 
     // // Setup Veracode CLI
-    core.info('Setting up Veracode CLI...');
-    await setupCli(vid, vkey);
+    // core.info('Setting up Veracode CLI...');
+    // await setupCli(vid, vkey); //TODO: rm after testing
 
     // Setup ast-grep
     core.info('Setting up ast-grep...');
