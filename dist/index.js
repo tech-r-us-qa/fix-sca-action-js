@@ -36211,51 +36211,6 @@ module.exports = setupAstGrep;
 
 /***/ }),
 
-/***/ 1296:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-const fs = __nccwpck_require__(7147);
-const path = __nccwpck_require__(1017);
-const os = __nccwpck_require__(2037);
-const core = __nccwpck_require__(2186);
-
-async function setupCli(vid, vkey) {
-  try {
-    // Create .veracode directory
-    const veracodeDir = path.join(os.homedir(), '.veracode');
-    if (!fs.existsSync(veracodeDir)) {
-      fs.mkdirSync(veracodeDir, { recursive: true });
-    }
-
-    // Create veracode.yml configuration file
-    const configPath = path.join(veracodeDir, 'veracode.yml');
-    const configContent = `api:
-    key-id: ${vid}
-    key-secret: ${vkey}
-oauth:
-    enabled: false
-    region: ""
-packager:
-    "":
-        trust: true
-    _users_someusers_project:
-        trust: true
-`;
-
-    fs.writeFileSync(configPath, configContent);
-    core.info(`Created Veracode configuration at ${configPath}`);
-
-    core.info('Veracode CLI setup completed successfully');
-  } catch (error) {
-    throw new Error(`Failed to setup Veracode CLI: ${error.message}`);
-  }
-}
-
-module.exports = setupCli;
-
-
-/***/ }),
-
 /***/ 6681:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -38288,7 +38243,6 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(2186);
 
-const setupCli = __nccwpck_require__(1296);
 const setupAstGrep = __nccwpck_require__(1939);
 const runFixSca = __nccwpck_require__(4485);
 const createPr = __nccwpck_require__(3759);
@@ -38302,18 +38256,12 @@ async function main() {
     const branch = core.getInput('branch');
     const githubApiUrl = core.getInput('github-api-url');
     const prNumber = core.getInput('pr-number');
-    const vid = core.getInput('vid');
-    const vkey = core.getInput('vkey');
     const fixScaParams = core.getInput('fix-sca-params');
 
     const workspaceDir = process.env.GITHUB_WORKSPACE;
     const actionPath = `${__dirname}/..`
 
     core.info('Starting Veracode Fix for SCA action...');
-
-    // // Setup Veracode CLI
-    // core.info('Setting up Veracode CLI...');
-    // await setupCli(vid, vkey); //TODO: rm after testing
 
     // Setup ast-grep
     core.info('Setting up ast-grep...');

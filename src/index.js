@@ -1,6 +1,5 @@
 const core = require('@actions/core');
 
-const setupCli = require('./setup-cli');
 const setupAstGrep = require('./setup-ast-grep');
 const runFixSca = require('./run-fix-sca');
 const createPr = require('./create-pr');
@@ -14,18 +13,12 @@ async function main() {
     const branch = core.getInput('branch');
     const githubApiUrl = core.getInput('github-api-url');
     const prNumber = core.getInput('pr-number');
-    const vid = core.getInput('vid');
-    const vkey = core.getInput('vkey');
     const fixScaParams = core.getInput('fix-sca-params');
 
     const workspaceDir = process.env.GITHUB_WORKSPACE;
     const actionPath = `${__dirname}/..`
 
     core.info('Starting Veracode Fix for SCA action...');
-
-    // // Setup Veracode CLI
-    // core.info('Setting up Veracode CLI...');
-    // await setupCli(vid, vkey); //TODO: rm after testing
 
     // Setup ast-grep
     core.info('Setting up ast-grep...');
