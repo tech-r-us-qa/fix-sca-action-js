@@ -1,6 +1,5 @@
 const core = require('@actions/core');
 
-const setupCli = require('./setup-cli');
 const setupAstGrep = require('./setup-ast-grep');
 const runFixSca = require('./run-fix-sca');
 const createPr = require('./create-pr');
@@ -22,10 +21,6 @@ async function main() {
     const actionPath = `${__dirname}/..`
 
     core.info('Starting Veracode Fix for SCA action...');
-
-    // // Setup Veracode CLI
-    // core.info('Setting up Veracode CLI...');
-    // await setupCli(vid, vkey); //TODO: rm after testing
 
     // Setup ast-grep
     core.info('Setting up ast-grep...');
