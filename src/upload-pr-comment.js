@@ -3,7 +3,7 @@ const path = require('path');
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 const github = require('@actions/github');
-const artifact = require('@actions/artifact');
+const { DefaultArtifactClient } = require('@actions/artifact');
 
 async function uploadPrComment(workspaceDir, repository, prNumber, githubToken, githubApiUrl) {
   try {
@@ -55,7 +55,7 @@ async function uploadPrComment(workspaceDir, repository, prNumber, githubToken, 
     core.info(workspaceDir)
 
     core.info('== Start upload ==')
-    const artifactClient = artifact.create();
+    const artifactClient = new DefaultArtifactClient();
     const artifactName = 'veracode-cli-pr-comment-json';
     const uploadResponse = await artifactClient.uploadArtifact(
       artifactName,

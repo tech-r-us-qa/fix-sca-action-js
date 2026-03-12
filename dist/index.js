@@ -36247,7 +36247,7 @@ const path = __nccwpck_require__(1017);
 const core = __nccwpck_require__(2186);
 const exec = __nccwpck_require__(1514);
 const github = __nccwpck_require__(5438);
-const artifact = __nccwpck_require__(2605);
+const { DefaultArtifactClient } = __nccwpck_require__(2605);
 
 async function uploadPrComment(workspaceDir, repository, prNumber, githubToken, githubApiUrl) {
   try {
@@ -36299,7 +36299,7 @@ async function uploadPrComment(workspaceDir, repository, prNumber, githubToken, 
     core.info(workspaceDir)
 
     core.info('== Start upload ==')
-    const artifactClient = artifact.create();
+    const artifactClient = new DefaultArtifactClient();
     const artifactName = 'veracode-cli-pr-comment-json';
     const uploadResponse = await artifactClient.uploadArtifact(
       artifactName,
