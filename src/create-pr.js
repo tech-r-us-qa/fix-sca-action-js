@@ -69,7 +69,21 @@ async function createPr(workspaceDir, repository, sourceBranch, githubToken, git
     // Create Pull Request using GitHub API (Octokit)
     core.info('Creating pull request via GitHub API...');
     const prTitle = `[Veracode Fix for SCA] ${branchName}`;
-    const prBody = '';
+     // Check for sca-fix-report.md and use it for PR description
+    let prBody = '';
+    const reportPath = path.join(workspaceDir, 'sca-fix-report.md');
+    if (fs.existsSync(reportPath)) {
+      try {
+        prBody = fs.readFileSync(reportPath, 'utf8');
+        core.info('Loaded sca-fix-report.md for PR description');
+      } catch (error) {
+        core.warning(`Failed to read sca-fix-report.md: ${error.message}`);
+        prBody = '## Veracode Fix for SCA\n\nAutomated dependency updates applied.';
+      }
+    } else {
+      core.warning('sca-fix-report.md not found. Using default PR description.');
+      prBody = '## Veracode Fix for SCA\n\nAutomated dependency updates applied.';
+    }
 
     // Parse repository string (format: owner/repo)
     const [owner, repo] = repository.split('/');
@@ -89,6 +103,16 @@ async function createPr(workspaceDir, repository, sourceBranch, githubToken, git
       head: branchName,
       base: sourceBranch
     });
+
+    // Clean up report file after using it
+    try {
+      if (fs.existsSync(reportPath)) {
+        fs.unlinkSync(reportPath);
+        core.info('Cleaned up sca-fix-report.md');
+      }
+    } catch (error) {
+      core.warning(`Failed to clean up sca-fix-report.md: ${error.message}`);
+    }
 
     // Save response to file for use in upload-pr-comment step
     const responseFilePath = path.join(workspaceDir, 'github_fix_pr_post_response.json');
