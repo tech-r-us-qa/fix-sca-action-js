@@ -15,13 +15,17 @@
   ],
   "author": "Veracode",
   "license": "MIT",
+  "engines": {
+    "node": ">=25.3.0"
+  },
   "dependencies": {
-    "@actions/artifact": "^1.1.1",
+    "@actions/artifact": "^2.1.10",
     "@actions/core": "^1.10.1",
     "@actions/exec": "^1.1.1",
     "@actions/github": "^6.0.0",
     "@actions/io": "^1.1.2",
-    "extract-zip": "^2.0.1"
+    "extract-zip": "^2.0.1",
+    "glob": "^10.3.10"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.36.0"
