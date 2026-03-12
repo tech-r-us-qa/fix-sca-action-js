@@ -22,12 +22,6 @@ inputs:
   pr-number:
     description: "Original PR number to post comments on"
     required: true
-  vid:
-    description: "Veracode API ID"
-    required: true
-  vkey:
-    description: "Veracode API key"
-    required: true
   fix-sca-params:
     description: "Additional parameters for Fix SCA command"
     required: false
