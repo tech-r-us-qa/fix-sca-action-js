@@ -69,7 +69,7 @@ async function createPr(workspaceDir, repository, sourceBranch, githubToken, git
     // Create Pull Request using GitHub API (Octokit)
     core.info('Creating pull request via GitHub API...');
     const prTitle = `[Veracode Fix for SCA] ${branchName}`;
-    const prBody = '';
+    const prBody = await readScaFixReport(workspaceDir);
 
     // Parse repository string (format: owner/repo)
     const [owner, repo] = repository.split('/');
@@ -101,6 +101,23 @@ async function createPr(workspaceDir, repository, sourceBranch, githubToken, git
   } catch (error) {
     throw new Error(`Failed to create pull request: ${error.message}`);
   }
+}
+
+async function readScaFixReport(reportDir) {
+  const reportPath = path.join(reportDir, 'sca-fix-report.md');
+  
+  if (fs.existsSync(reportPath)) {
+    core.info('Reading sca-fix-report.md for PR description...');
+    const reportContent = fs.readFileSync(reportPath, 'utf-8');
+    
+    // Delete the file so it won't be included in the commit
+    fs.unlinkSync(reportPath);
+    core.info('sca-fix-report.md content captured and file deleted.');
+    
+    return reportContent;
+  }
+  
+  return '';
 }
 
 module.exports = createPr;
