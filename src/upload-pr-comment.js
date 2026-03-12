@@ -15,8 +15,6 @@ async function uploadPrComment(workspaceDir, repository, prNumber, githubToken, 
     }
 
     const prResponse = fs.readFileSync(resultsFilePath, 'utf8');
-    core.info('Fix PR Response:');
-    core.info(prResponse);
 
     // Generate the comment body
     let commentBody = generateDefaultCommentBody(prResponse);    
